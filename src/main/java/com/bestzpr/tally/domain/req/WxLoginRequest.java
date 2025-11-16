@@ -12,4 +12,5 @@ import lombok.Data;
 @Data
 public class WxLoginRequest {
     private String jsCode;
+    private String userName;
 }

@@ -43,7 +43,8 @@ public class AuthenticationAspect {
 
         // 获取请求的路径
         String requestPath = request.getRequestURI();
-        if(requestPath.equals("/v1/api/getOpenId")){
+        // 白名单：不需要校验 openId 的接口
+        if(requestPath.equals("/v1/api/getOpenId") || requestPath.equals("/v1/api/isUserInfo")){
             // 执行目标方法
             return joinPoint.proceed();
         }
@@ -51,7 +52,7 @@ public class AuthenticationAspect {
         HttpServletResponse response = attributes.getResponse();
 
         String openId = request.getHeader("openId");
-        String apiKey = request.getHeader("apiKey");
+        // String apiKey = request.getHeader("apiKey");
         assert response != null;
         if (!StringUtils.hasText(openId)) {
             // 可以根据需要设置其他响应头或返回错误信息

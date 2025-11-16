@@ -33,6 +33,11 @@ public class User{
     private String userName;
 
     /**
+     * 别名
+     */
+    private String alias;
+
+    /**
      * 头像 URL
      */
     private String avatarUrl;

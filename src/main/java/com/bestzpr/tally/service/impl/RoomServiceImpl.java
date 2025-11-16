@@ -110,7 +110,7 @@ public class RoomServiceImpl implements RoomService {
         myPointInfoVo.setUserPoint(null != myAmount ? myAmount : BigDecimal.ZERO);
         myPointInfoVo.setUserId(user.getId());
         myPointInfoVo.setUserAvatar(user.getAvatarUrl());
-        myPointInfoVo.setUserName(user.getUserName());
+        myPointInfoVo.setUserName(user.getAlias());
         roomDetail.setMyPointInfoVo(myPointInfoVo);
         // 当前房间的所有用户的当前积分情况
         roomDetail.setOtherPointInfoVoArr(getUserRoomByRoomId(roomId));

@@ -82,7 +82,29 @@ public class WechatService {
 
     public String getQRCodeUrl(Long roomId){
         String fileName = "roomCode/" + UUID.randomUUID().toString();
-        return ossService.uploadByteDataToOSS(fileName,downloadMiniCode(roomId));
+        // return ossService.uploadByteDataToOSS(fileName,downloadMiniCode(roomId));
+
+        // 1. 生成文件名（带后缀）
+        fileName = "roomCode_" + UUID.randomUUID() + ".png";
+        
+        // 2. 指定本地保存路径（可自定义目录）
+        String filePath = "/home/lian/qrcodes/" + fileName;  // Linux 下
+        // String filePath = "C:\\Users\\lian\\qrcodes\\" + fileName; // Windows 下
+        
+        try {
+            // 3. 获取二维码的字节数据
+            byte[] data = downloadMiniCode(roomId);
+
+            // 4. 写入文件
+            java.nio.file.Files.createDirectories(java.nio.file.Paths.get(filePath).getParent()); // 确保目录存在
+            java.nio.file.Files.write(java.nio.file.Paths.get(filePath), data);
+
+            // 5. 返回文件路径
+            return filePath;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     private String getAccessToken() throws IOException {
@@ -129,6 +151,9 @@ public class WechatService {
         Map<String, Object> paramMap = new HashMap<>();
         paramMap.put("scene", certNumber);
         paramMap.put("is_hyaline", true);
+        // paramMap.put("check_path", false);
+        // paramMap.put("scene", "roomId=" + certNumber);
+        paramMap.put("page", "pages/room/room");
 
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 

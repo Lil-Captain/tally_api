@@ -80,18 +80,16 @@ public class ApiController {
     public ResponseEntity wxLogin(WxLoginRequest request) {
         User userExist = null;
         try {
-            WeChatUserInfoDTO weChatLoginInfo = wechatService.getWeChatLoginInfo(request.getJsCode());
+            // WeChatUserInfoDTO weChatLoginInfo = wechatService.getWeChatLoginInfo(request.getJsCode());
+            // WeChatUserInfoDTO weChatLoginInfo = new WeChatUserInfoDTO();
+            // weChatLoginInfo.setOpenid("1");
+            userExist = userDao.findByUserName(request.getUserName());
             // 返回成功响应
             // 注册一个用户
-            userExist = userDao.findByOpenId(weChatLoginInfo.getOpenid());
+            // userExist = userDao.findByOpenId(weChatLoginInfo.getOpenid());
             if(Objects.isNull(userExist)){
-                userExist = new User();
-                // 随机产生头像和名称
-                userExist.setUserName(CartoonNameGenerator.generateCartoonName());
-                userExist.setAvatarUrl(AvatarGenerator.getAvatarUrl());
-                userExist.setOpenId(weChatLoginInfo.getOpenid());
-                userExist.setCreateTime(new Date());
-                userDao.save(userExist);
+                ApiResponse<String> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "用户不存在", null);
+                return ResponseEntity.badRequest().body(response);
             }
         } catch (Exception ex) {
             log.info("wxLogin exception:{}", ex.getMessage());
@@ -131,7 +129,7 @@ public class ApiController {
     public ResponseEntity setUserName(@RequestParam String userName) {
         User user = UserContext.getUser();
         // 设置用户名
-        user.setUserName(userName);
+        user.setAlias(userName);
         User save = userDao.save(user);
         ApiResponse<User> response = new ApiResponse<User>(HttpStatus.OK.value(), "成功", save);
         return ResponseEntity.ok().body(response);
@@ -252,6 +250,17 @@ public class ApiController {
         List<RoomUserCase> roomUserCaseList = roomService.userHistoryInfoDetails();
         ApiResponse<List<RoomUserCase>> response = new ApiResponse<>(HttpStatus.OK.value(), "成功", roomUserCaseList);
         return ResponseEntity.ok().body(response);
+    }
+
+    @PostMapping("/isUserInfo")
+    public ResponseEntity isUserInfo(@RequestParam String userName){
+        User userExist = userDao.findByUserName(userName);
+        if(null != userExist){
+            ApiResponse<Boolean> response = new ApiResponse<>(HttpStatus.OK.value(), "用户名已存在", true);
+            return ResponseEntity.ok().body(response);
+        }
+        ApiResponse<String> response = new ApiResponse<>(HttpStatus.BAD_REQUEST.value(), "用户名不存在", null);
+        return ResponseEntity.badRequest().body(response);
     }
 
 }
